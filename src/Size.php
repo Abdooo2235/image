@@ -6,6 +6,7 @@ namespace Intervention\Image;
 
 use ArrayIterator;
 use DivisionByZeroError;
+use ErrorException;
 use Intervention\Image\Exceptions\InvalidArgumentException;
 use Intervention\Image\Exceptions\RuntimeException;
 use Intervention\Image\Exceptions\StateException;
@@ -71,8 +72,8 @@ class Size extends Polygon implements SizeInterface
      */
     public function setWidth(int $width): self
     {
-        $this[1]->setX($this[0]->x() + $width);
-        $this[2]->setX($this[3]->x() + $width);
+        parent::offsetGet(1)->setX(parent::offsetGet(0)->x() + $width);
+        parent::offsetGet(2)->setX(parent::offsetGet(3)->x() + $width);
 
         return $this;
     }
@@ -84,8 +85,8 @@ class Size extends Polygon implements SizeInterface
      */
     public function setHeight(int $height): self
     {
-        $this[2]->setY($this[1]->y() + $height);
-        $this[3]->setY($this[0]->y() + $height);
+        parent::offsetGet(2)->setY(parent::offsetGet(1)->y() + $height);
+        parent::offsetGet(3)->setY(parent::offsetGet(0)->y() + $height);
 
         return $this;
     }
@@ -416,6 +417,34 @@ class Size extends Polygon implements SizeInterface
     public function getIterator(): Traversable
     {
         return new ArrayIterator([$this->width(), $this->height()]);
+    }
+
+    /**
+     * Determine if width and height value exists at given offset.
+     */
+    public function offsetExists(mixed $offset): bool
+    {
+        return in_array($offset, [0, 1], true);
+    }
+
+    /**
+     * Return width or height at given offset.
+     *
+     * @throws ErrorException
+     */
+    public function offsetGet(mixed $offset): mixed
+    {
+        if (!is_int($offset)) {
+            throw new ErrorException('Cannot access offset of type ' . get_debug_type($offset) . ' on ' . $this::class);
+        }
+
+        return match ($offset) {
+            0 => $this->width(),
+            1 => $this->height(),
+            default => throw new ErrorException(
+                'Undefined offset: ' . $offset
+            ),
+        };
     }
 
     /**

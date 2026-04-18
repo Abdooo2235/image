@@ -405,6 +405,16 @@ final class SizeTest extends BaseTestCase
         $this->assertEquals([800, 600], $values);
     }
 
+    public function testArrayDestructuring(): void
+    {
+        $size = new Size(800, 600);
+
+        [$width, $height] = $size;
+
+        $this->assertSame(800, $width);
+        $this->assertSame(600, $height);
+    }
+
     public function testDebugInfo(): void
     {
         $size = new Size(800, 600);

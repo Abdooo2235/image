@@ -2,13 +2,15 @@ services:
   tests:
     build: ./
     working_dir: /project
-    entrypoint: ["/usr/local/bin/entrypoint.sh", "./vendor/bin/phpunit"]
+    entrypoint: ["/bin/sh", "-lc", "composer install --quiet && exec \"$@\"", "--"]
+    command: ["./vendor/bin/phpunit"]
     volumes:
       - ./:/project
   coverage:
     build: ./
     working_dir: /project
-    entrypoint: ["/usr/local/bin/entrypoint.sh", "./vendor/bin/phpunit", "--coverage-text"]
+    entrypoint: ["/bin/sh", "-lc", "composer install --quiet && exec \"$@\"", "--"]
+    command: ["./vendor/bin/phpunit", "--coverage-text"]
     volumes:
       - ./:/project
     environment:
@@ -16,12 +18,14 @@ services:
   analysis:
     build: ./
     working_dir: /project
-    entrypoint: ["/usr/local/bin/entrypoint.sh", "./vendor/bin/phpstan", "analyze", "--memory-limit=512M"]
+    entrypoint: ["/bin/sh", "-lc", "composer install --quiet && exec \"$@\"", "--"]
+    command: ["./vendor/bin/phpstan", "analyze", "--memory-limit=512M"]
     volumes:
       - ./:/project
   standards:
     build: ./
     working_dir: /project
-    entrypoint: ["/usr/local/bin/entrypoint.sh", "./vendor/bin/phpcs"]
+    entrypoint: ["/bin/sh", "-lc", "composer install --quiet && exec \"$@\"", "--"]
+    command: ["./vendor/bin/phpcs"]
     volumes:
       - ./:/project
