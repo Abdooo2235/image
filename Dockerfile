@@ -1,10 +1,10 @@
-FROM php:8.3-cli
+FROM php:8.3-cli-bookworm
 
 ARG IMAGEMAGICK_VERSION=7.1.2-15
 
 # install dependencies for building ImageMagick and PHP extensions
-RUN apt update \
-        && apt install -y \
+RUN apt-get update -o Acquire::Retries=3 \
+        && apt-get install -y --no-install-recommends \
             libjpeg-dev \
             libgif-dev \
             libtiff-dev \
@@ -19,7 +19,8 @@ RUN apt update \
             zip \
             curl \
             xz-utils \
-        && apt-get clean
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
 
 # build and install ImageMagick from source
 RUN curl -o /tmp/ImageMagick.tar.xz -sL \
