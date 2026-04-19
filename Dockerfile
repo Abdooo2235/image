@@ -35,7 +35,9 @@ RUN curl -o /tmp/ImageMagick.tar.xz -sL \
         && rm -rf /tmp/ImageMagick*
 
 # install PHP extensions
-RUN pecl install imagick \
+# Pin imagick below 3.8.x to avoid transient PHP-Parser tarball fetch failures.
+RUN pecl channel-update pecl.php.net \
+        && pecl install imagick-3.7.0 \
         && pecl install xdebug \
         && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-avif \
         && docker-php-ext-enable \
