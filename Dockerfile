@@ -49,6 +49,4 @@ RUN pecl install imagick \
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # setup entrypoint
-RUN printf '#!/bin/sh\nset -e\n\ncomposer install --quiet\n\nexec "$@"\n' > /usr/local/bin/entrypoint.sh \
-    && chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "-lc", "composer install --quiet && exec \"$@\"", "--"]
