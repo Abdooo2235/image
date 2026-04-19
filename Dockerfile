@@ -51,6 +51,7 @@ RUN pecl channel-update pecl.php.net \
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # setup entrypoint
-RUN printf '\x23\x21\x2f\x62\x69\x6e\x2f\x73\x68\x0a\x73\x65\x74\x20\x2d\x65\x0a\x0a\x63\x6f\x6d\x70\x6f\x73\x65\x72\x20\x69\x6e\x73\x74\x61\x6c\x6c\x20\x2d\x2d\x71\x75\x69\x65\x74\x0a\x0a\x65\x78\x65\x63\x20\x22\x24\x40\x22\x0a' > /usr/local/bin/entrypoint.sh \
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh \
     && chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/bin/sh", "-lc", "composer install --quiet && exec \"$@\"", "--"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
