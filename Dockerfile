@@ -1,10 +1,10 @@
-FROM php:8.3-cli-bookworm
+FROM php:8.3-cli
 
 ARG IMAGEMAGICK_VERSION=7.1.2-15
 
 # install dependencies for building ImageMagick and PHP extensions
-RUN apt-get update -o Acquire::Retries=3 \
-        && apt-get install -y --no-install-recommends \
+RUN apt update \
+        && apt install -y \
             libjpeg-dev \
             libgif-dev \
             libtiff-dev \
@@ -19,8 +19,7 @@ RUN apt-get update -o Acquire::Retries=3 \
             zip \
             curl \
             xz-utils \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
+        && apt-get clean
 
 # build and install ImageMagick from source
 RUN curl -o /tmp/ImageMagick.tar.xz -sL \
@@ -36,9 +35,7 @@ RUN curl -o /tmp/ImageMagick.tar.xz -sL \
         && rm -rf /tmp/ImageMagick*
 
 # install PHP extensions
-# Pin imagick below 3.8.x to avoid transient PHP-Parser tarball fetch failures.
-RUN pecl channel-update pecl.php.net \
-        && pecl install imagick-3.7.0 \
+RUN pecl install imagick \
         && pecl install xdebug \
         && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp --with-avif \
         && docker-php-ext-enable \
@@ -52,7 +49,5 @@ RUN pecl channel-update pecl.php.net \
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 # setup entrypoint
-# Write the script bytes directly to guarantee LF-only line endings on every host OS.
-RUN printf '\x23\x21\x2f\x62\x69\x6e\x2f\x73\x68\x0a\x73\x65\x74\x20\x2d\x65\x0a\x0a\x63\x6f\x6d\x70\x6f\x73\x65\x72\x20\x69\x6e\x73\x74\x61\x6c\x6c\x20\x2d\x2d\x71\x75\x69\x65\x74\x0a\x0a\x65\x78\x65\x63\x20\x22\x24\x40\x22\x0a' > /usr/local/bin/entrypoint.sh \
-    && chmod +x /usr/local/bin/entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

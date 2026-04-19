@@ -1,6 +1,4 @@
 * text=auto
-/entrypoint.sh text eol=lf
-/Dockerfile text eol=lf
 
 /.editorconfig      export-ignore
 /.github            export-ignore
